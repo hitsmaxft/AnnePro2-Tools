@@ -2,14 +2,21 @@ let
   oxalica_overlay = import (builtins.fetchTarball
     "https://github.com/oxalica/rust-overlay/archive/master.tar.gz");
   nixpkgs = import <nixpkgs> { overlays = [ oxalica_overlay ]; };
-  pkgs = nixpkgs;
 
   # Rolling updates, not deterministic.
   rust_channel = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain;
+
 in with nixpkgs; 
 pkgs.mkShell {
 
-  buildInputs = [ pkgs.cargo pkgs.rustc pkgs.libusb1 ];
+  buildInputs = [
+    pkgs.cargo
+    pkgs.rustc
+    pkgs.libusb1
+    gnumake
+    pkgsCross.arm-embedded.buildPackages.gcc
+    #pkgsCross.muslpi.buildPackages.gcc
+  ];
 
   nativeBuildInputs = [
     (rust_channel.override{
